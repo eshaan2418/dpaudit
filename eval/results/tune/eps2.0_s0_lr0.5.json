@@ -1,0 +1,17 @@
+{
+ "target_eps": 2.0,
+ "seed": 0,
+ "lr": 0.5,
+ "epochs": 3,
+ "q": 0.004696299829392233,
+ "steps": 639,
+ "sigma": 0.7967269897460938,
+ "delta": 1e-05,
+ "achieved_eps": 1.9988765163018716,
+ "n_train": 54511,
+ "accuracy": 0.8068,
+ "eval_split": "val",
+ "wall_s": 84.37493358398206,
+ "clip_fraction": 0.4476947237814723,
+ "git_commit": "4aee1a143aa0a04486f0dfa1426218bfc8536030"
+}

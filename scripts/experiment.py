@@ -58,7 +58,8 @@ def main() -> None:
     steps = int(round(a.epochs / q))
     private = math.isfinite(a.eps)
     sigma = calibrate_sigma(a.eps, q, steps, DELTA) if private else None
-    lr = a.lr if a.lr is not None else (2.0 if private else 0.1)
+    # learning rates chosen on the validation split (scripts/tune.sh, eval/results/tune)
+    lr = a.lr if a.lr is not None else (0.25 if private else 0.1)
     cfg = DPConfig(epochs=a.epochs, sample_rate=q, lr=lr, noise_multiplier=sigma, seed=a.seed)
     torch.manual_seed(a.seed)
     model = SmallCNN()
