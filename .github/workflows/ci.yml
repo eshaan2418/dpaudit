@@ -23,7 +23,7 @@ jobs:
         run: mypy
       - name: Accountant vs Opacus, sensitivity, audit-bound tests
         run: pytest -q
-      - name: Smoke: DP-SGD step sensitivity + accountant check
+      - name: "Smoke: DP-SGD step sensitivity + accountant check"
         run: pytest -q tests -k "sensitivity or opacus"
 
 
