@@ -76,18 +76,26 @@ axes[0].errorbar(xs, acc[:, 0], yerr=acc[:, 1], marker="o", capsize=3, color="#4
 if math.inf in by:
     a_inf = ci([100 * r["accuracy"] for r in by[math.inf]])[0]
     axes[0].axhline(a_inf, ls="--", color="#888", label="non-private")
-axes[0].set_xscale("log")
 axes[0].set_xlabel("ε (δ = 1e-5)")
 axes[0].set_ylabel("test accuracy %")
 axes[0].legend(frameon=False, fontsize=8)
 lb = np.array([np.mean([r["audit"]["eps_lower"] for r in by[e]]) for e in fin])
-axes[1].plot(xs, xs, "--", color="#888", label="theoretical upper bound (ε)")
-axes[1].plot(xs, lb, "o-", color="#C44E52", label="audited lower bound")
-axes[1].set_xscale("log")
-axes[1].set_yscale("symlog", linthresh=0.1)
+axes[1].plot(xs, xs, "--", color="#888", label="accountant upper bound")
+axes[1].plot(xs, lb, "o-", color="#C44E52", label="audit lower bound, mislabeled canaries")
+if noise:
+    nz = sorted((r["target_eps"], r["audit"]["eps_lower"]) for r in noise
+                if not math.isinf(r["target_eps"]))
+    axes[1].plot([a for a, _ in nz], [b for _, b in nz], "s-", color="#8172B2",
+                 label="audit lower bound, noise canaries")
+    inf_n = [r["audit"]["eps_lower"] for r in noise if math.isinf(r["target_eps"])]
+    if inf_n:
+        axes[1].axhline(inf_n[0], color="#8172B2", lw=0.8, ls=":",
+                        label=f"non-private model audits at {inf_n[0]:.2f}")
 axes[1].set_xlabel("target ε")
 axes[1].set_ylabel("ε")
-axes[1].legend(frameon=False, fontsize=8)
+axes[1].legend(frameon=False, fontsize=7)
+for ax in axes:
+    ax.set_xticks(xs, [f"{v:g}" for v in xs])
 for ax in axes:
     ax.spines[["top", "right"]].set_visible(False)
 fig.tight_layout()
