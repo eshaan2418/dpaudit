@@ -72,7 +72,8 @@ def main() -> None:
     model = SmallCNN()
     stats = train(model, x_train, y_train, cfg)
     x_eval, y_eval = (xval, yval) if a.tune else (xte, yte)
-    rec = {"target_eps": a.eps, "seed": a.seed, "lr": lr, "canary": a.canary, "epochs": a.epochs, "q": q,
+    rec = {"target_eps": a.eps, "seed": a.seed, "lr": lr, "canary": a.canary,
+           "epochs": a.epochs, "q": q,
            "steps": steps, "sigma": sigma, "delta": DELTA,
            "achieved_eps": epsilon(q, sigma, steps, DELTA)[0] if private else None,
            "n_train": n, "accuracy": accuracy(model, x_eval, y_eval),

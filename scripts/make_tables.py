@@ -43,6 +43,19 @@ for e in eps_keys:
     out.append(f"| {label} | {sig} | {acc[0]:.1f} ± {acc[1]:.1f} | {mia[0]:.3f} ± {mia[1]:.3f} "
                f"| {tpr[0]:.2f} ± {tpr[1]:.2f}% | {can[0]:.3f} ± {can[1]:.3f} | "
                f"{np.mean(lbs):.2f} (per seed {', '.join(f'{x:.2f}' for x in lbs)}) |")
+noise = [json.loads(p.read_text()) for p in sorted(Path("eval/results/runs_noise").glob("*.json"))]
+if noise:
+    mis = {(r["target_eps"], r["seed"]): r for r in runs}
+    out += ["\n## Canary type ablation (seed 0): mislabeled real images vs random-noise images\n",
+            "| target ε | canary AUC (mislabeled) | ε lower bound (mislabeled) | canary AUC "
+            "(noise) | ε lower bound (noise) | test acc % (noise run) |",
+            "|---|---|---|---|---|---|"]
+    for r in sorted(noise, key=lambda r: (math.isinf(r["target_eps"]), r["target_eps"])):
+        m = mis.get((r["target_eps"], r["seed"]))
+        label = "∞" if math.isinf(r["target_eps"]) else f"{r['target_eps']:g}"
+        out.append(f"| {label} | {m['canary_auc']:.3f} | {m['audit']['eps_lower']:.2f} | "
+                   f"{r['canary_auc']:.3f} | {r['audit']['eps_lower']:.2f} | "
+                   f"{100 * r['accuracy']:.1f} |")
 tune = [json.loads(p.read_text()) for p in sorted(Path("eval/results/tune").glob("*.json"))]
 if tune:
     out += ["\n## Learning-rate selection (3-epoch runs, validation split)\n",
@@ -50,7 +63,7 @@ if tune:
     for r in sorted(tune, key=lambda r: (math.isinf(r["target_eps"]), r["lr"])):
         name = "non-private" if math.isinf(r["target_eps"]) else f"ε = {r['target_eps']:g}"
         out.append(f"| {name} | {r['lr']} | {100 * r['accuracy']:.1f} |")
-wall = sum(r["wall_s"] for r in runs + tune) / 60
+wall = sum(r["wall_s"] for r in runs + tune + noise) / 60
 out.append(f"\nCompute: {wall:.0f} CPU-process minutes of training (4 threads each).\n")
 Path("eval/results/tables.md").write_text("\n".join(out) + "\n")
 print("\n".join(out))

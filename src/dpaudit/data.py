@@ -39,6 +39,6 @@ def fashion_mnist(cache: str | Path = "data") -> tuple[torch.Tensor, ...]:
     ytr = _read(d / "train-labels-idx1-ubyte.gz", 8)
     xte = _read(d / "t10k-images-idx3-ubyte.gz", 16).reshape(-1, 1, 28, 28)
     yte = _read(d / "t10k-labels-idx1-ubyte.gz", 8)
-    f = lambda a: (torch.from_numpy(a.astype(np.float32)) / 255 - MEAN) / STD
-    return f(xtr), torch.from_numpy(ytr.astype(np.int64)), f(xte), torch.from_numpy(
+    norm = lambda a: (torch.from_numpy(a.astype(np.float32)) / 255 - MEAN) / STD
+    return norm(xtr), torch.from_numpy(ytr.astype(np.int64)), norm(xte), torch.from_numpy(
         yte.astype(np.int64))

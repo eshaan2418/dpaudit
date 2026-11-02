@@ -1,0 +1,29 @@
+{
+ "target_eps": 8.0,
+ "seed": 0,
+ "lr": 0.25,
+ "canary": "noise",
+ "epochs": 10,
+ "q": 0.004696299829392233,
+ "steps": 2129,
+ "sigma": 0.5601181030273437,
+ "delta": 1e-05,
+ "achieved_eps": 7.992708515147621,
+ "n_train": 54511,
+ "accuracy": 0.8511,
+ "eval_split": "test",
+ "wall_s": 253.34987429200555,
+ "clip_fraction": 0.34262504802728944,
+ "git_commit": "314d1d8ef31021ee96540f1b7d13d6ffff1f028f",
+ "mia_auc": 0.506396315,
+ "mia_tpr_at_1pct_fpr": 0.0087,
+ "mia_tpr_at_0.1pct_fpr": 0.001,
+ "canary_auc": 0.5357873210633947,
+ "audit": {
+  "guesses": 200,
+  "correct": 117,
+  "accuracy": 0.585,
+  "eps_lower": 0.013649897454633825,
+  "k": 100
+ }
+}

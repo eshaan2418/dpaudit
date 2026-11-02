@@ -11,6 +11,15 @@ FashionMNIST, tanh CNN (26k params), 10 epochs, expected batch 256, δ = 1e-5, 3
 | 8 | 0.560 | 84.9 ± 0.6 | 0.507 ± 0.004 | 0.10 ± 0.07% | 0.532 ± 0.018 | 0.01 (per seed 0.00, 0.04, 0.00) |
 | ∞ (non-private) | - | 89.6 ± 0.2 | 0.513 ± 0.002 | 0.11 ± 0.14% | 0.632 ± 0.014 | 0.50 (per seed 0.44, 0.43, 0.62) |
 
+## Canary type ablation (seed 0): mislabeled real images vs random-noise images
+
+| target ε | canary AUC (mislabeled) | ε lower bound (mislabeled) | canary AUC (noise) | ε lower bound (noise) | test acc % (noise run) |
+|---|---|---|---|---|---|
+| 1 | 0.506 | 0.00 | 0.506 | 0.00 | 79.5 |
+| 4 | 0.530 | 0.00 | 0.540 | 0.00 | 84.1 |
+| 8 | 0.528 | 0.00 | 0.536 | 0.01 | 85.1 |
+| ∞ | 0.628 | 0.44 | 0.710 | 1.43 | 89.6 |
+
 ## Learning-rate selection (3-epoch runs, validation split)
 
 | setting | lr | validation accuracy |
@@ -26,5 +35,5 @@ FashionMNIST, tanh CNN (26k params), 10 epochs, expected batch 256, δ = 1e-5, 3
 | non-private | 0.1 | 88.3 |
 | non-private | 0.2 | 87.9 |
 
-Compute: 75 CPU-process minutes of training (4 threads each).
+Compute: 90 CPU-process minutes of training (4 threads each).
 
