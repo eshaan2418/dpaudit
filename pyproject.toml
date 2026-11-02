@@ -1,0 +1,39 @@
+[project]
+name = "dpaudit"
+version = "0.1.0"
+description = "DP-SGD from scratch with a Rényi-DP accountant, privacy-utility curves, and empirical privacy audits (membership inference and one-run canary auditing) that bound epsilon from below"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Eshaan Kapooswalla", email = "eshaank@my.yorku.ca" }]
+requires-python = ">=3.11"
+dependencies = ["numpy>=1.26", "scipy>=1.11", "torch>=2.3"]
+
+[project.optional-dependencies]
+bench = ["matplotlib>=3.8", "opacus>=1.4"]
+dev = ["pytest>=8", "hypothesis>=6", "ruff>=0.6", "mypy>=1.10", "opacus>=1.4"]
+
+[project.scripts]
+dpaudit = "dpaudit.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/dpaudit"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+ignore = ["UP031", "E741", "E731"]
+
+[tool.mypy]
+python_version = "3.11"
+ignore_missing_imports = true
+files = ["src/dpaudit"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
