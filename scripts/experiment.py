@@ -37,6 +37,9 @@ def main() -> None:
     ap.add_argument("--lr", type=float, default=None)
     ap.add_argument("--epochs", type=int, default=10)
     ap.add_argument("--tune", action="store_true")
+    ap.add_argument("--canary", choices=["mislabeled", "noise"], default="mislabeled",
+                    help="mislabeled: real images with a wrong label; noise: i.i.d. Gaussian "
+                         "images with a random label (out-of-distribution, easier to audit)")
     a = ap.parse_args()
     torch.set_num_threads(4)
     commit = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True,
@@ -50,6 +53,10 @@ def main() -> None:
     y_can = ytr.clone()
     wrong = (ytr[canary_idx].numpy() + rng.integers(1, 10, M_CANARIES)) % 10
     y_can[canary_idx] = torch.from_numpy(wrong)
+    if a.canary == "noise":
+        xtr = xtr.clone()
+        gen = torch.Generator().manual_seed(2000 + a.seed)
+        xtr[canary_idx] = torch.randn(M_CANARIES, 1, 28, 28, generator=gen) * 2.0
     keep = np.ones(55000, dtype=bool)
     keep[canary_idx[~included]] = False
     x_train, y_train = xtr[keep], y_can[keep]
@@ -65,7 +72,7 @@ def main() -> None:
     model = SmallCNN()
     stats = train(model, x_train, y_train, cfg)
     x_eval, y_eval = (xval, yval) if a.tune else (xte, yte)
-    rec = {"target_eps": a.eps, "seed": a.seed, "lr": lr, "epochs": a.epochs, "q": q,
+    rec = {"target_eps": a.eps, "seed": a.seed, "lr": lr, "canary": a.canary, "epochs": a.epochs, "q": q,
            "steps": steps, "sigma": sigma, "delta": DELTA,
            "achieved_eps": epsilon(q, sigma, steps, DELTA)[0] if private else None,
            "n_train": n, "accuracy": accuracy(model, x_eval, y_eval),
@@ -83,7 +90,8 @@ def main() -> None:
         sc = -per_example_loss(model, xtr[canary_idx], y_can[canary_idx])
         rec["canary_auc"] = roc_auc(sc[included], sc[~included])
         rec["audit"] = best_one_run_audit(sc, included, ks=(25, 50, 100, 200))
-    out = Path("eval/results") / ("tune" if a.tune else "runs")
+    out = Path("eval/results") / ("tune" if a.tune else
+                                  ("runs" if a.canary == "mislabeled" else "runs_noise"))
     out.mkdir(parents=True, exist_ok=True)
     name = f"eps{a.eps}_s{a.seed}" + (f"_lr{lr}" if a.tune else "")
     (out / f"{name}.json").write_text(json.dumps(rec, indent=1))
